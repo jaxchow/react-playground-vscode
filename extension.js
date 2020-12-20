@@ -17,7 +17,6 @@ const {
     
 let compiler;
 let devServer;
-
 function activate(context) {
     
     const { extensionPath } = context; //context.storagePath    
@@ -47,22 +46,31 @@ function activate(context) {
                 const webpackConfig = createWebpackConfig({ contentBase, extensionPath: path.resolve(extensionPath), workspacePath: path.resolve(workspacePath)});
                 fs.writeFileSync(path.join(contentBase, 'playground.html'), createContentEntry());
                 fs.writeFileSync(path.join(contentBase, 'index.js'), createEntry(filePath));
-                fs.writeFileSync(path.join(contentBase, 'index.html'), createEntryHtml());
+                // fs.writeFileSync(path.join(contentBase, 'index.html'), createEntryHtml());
 
                 addDevServerEntrypoints(webpackConfig, webpackConfig.devServer);                
                 compiler = webpack(webpackConfig);
                 devServer = new WebpackDevServer(compiler, webpackConfig.devServer);
-                
+                vscode.window.showInformationMessage("webpack服务启动中，请稍后...") 
                 
                 devServer.listen(webpackConfig.devServer.port, 'localhost', function(err) {
                     if(err) throw err;                                     
-                    vscode.commands.executeCommand('vscode.previewHtml', playgroundUri, vscode.ViewColumn.Two, 'React Playground');
+                    const panel = vscode.window.createWebviewPanel(
+                        'catCoding',
+                        'React Component Playground',
+                        vscode.ViewColumn.Two,
+                        {
+                            enableScripts:true
+                        }
+                      );
+                      panel.webview.html = createContentEntry()
                 });
             } else {
-                vscode.commands.executeCommand('vscode.previewHtml', playgroundUri, vscode.ViewColumn.Two, 'React Playground');
+                      panel.webview.html = createContentEntry();
             }
             
         } catch ( e ) {
+            vscode.window.showInformationMessage(e)
             console.error(e);
         }
 

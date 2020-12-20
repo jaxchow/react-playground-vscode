@@ -78,6 +78,7 @@ const createWebpackConfig = ({ devServerPort = 9123, contentBase, extensionPath,
             ]
         },
         devServer: {
+            disableHostCheck: true,
             contentBase: contentBase,
             port: devServerPort,
             inline: true,
